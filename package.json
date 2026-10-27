@@ -1,0 +1,31 @@
+{
+  "name": "impactbridge",
+  "version": "1.0.0",
+  "description": "CSR fund matching and milestone-based disbursement platform for companies and NGOs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test tests/"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.12",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}

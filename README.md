@@ -2,7 +2,7 @@
 
 **CSR fund matching and milestone-based disbursement for companies and NGOs in India.**
 
-> Live app: `<add your Render URL here>` · Demo video: `<add link>`
+> Live app: https://impactbridge-8n8m.onrender.com · Demo video: https://drive.google.com/file/d/1c8dwWgzbqO4glBLYvka63Xo6izE-ikAe/view?usp=drive_link
 
 ## Problem statement
 

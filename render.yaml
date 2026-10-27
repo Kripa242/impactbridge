@@ -1,0 +1,32 @@
+# Render Blueprint: New → Blueprint → pick this repo. Creates the web service and a Postgres database.
+databases:
+  - name: impactbridge-db
+    plan: free
+    databaseName: impactbridge
+    user: impactbridge
+
+services:
+  - type: web
+    name: impactbridge
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: impactbridge-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SEED_DEMO
+        value: "true"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

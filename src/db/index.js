@@ -2,7 +2,7 @@
 // - Production: real PostgreSQL via `pg` (DATABASE_URL).
 // - Local dev / tests: PGlite, an embedded Postgres (WASM) — same SQL dialect, zero setup.
 // Both expose the same tiny interface: query(sql, params) -> rows, and tx(fn) for transactions.
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import pg from 'pg';
@@ -45,6 +45,7 @@ function pgImpl(connectionString) {
 async function pgliteImpl(dataDir) {
   const { PGlite } = await import('@electric-sql/pglite');
   const opts = { parsers: { [DATE_OID]: keepDate } };
+  if (dataDir !== 'memory://') await mkdir(dataDir, { recursive: true });
   const db = dataDir === 'memory://' ? new PGlite(opts) : new PGlite(dataDir, opts);
   await db.waitReady;
   return {

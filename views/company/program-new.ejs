@@ -1,0 +1,44 @@
+<%- include('../partials/top') %>
+<p class="crumb"><a href="/company/programs">← Programs</a></p>
+<div class="page-head"><h1>New CSR program</h1></div>
+<form class="card form narrow" method="post" action="/company/programs" novalidate data-once>
+  <label for="title">Program title</label>
+  <input id="title" name="title" value="<%= values.title || '' %>" maxlength="150" placeholder="e.g. Foundational literacy in rural Karnataka" required>
+  <%- include('../partials/err', { name: 'title' }) %>
+
+  <label for="description">Goals and what you want to fund</label>
+  <textarea id="description" name="description" rows="5" maxlength="3000" required><%= values.description || '' %></textarea>
+  <%- include('../partials/err', { name: 'description' }) %>
+
+  <div class="grid2">
+    <div>
+      <label for="cause">Cause area (Schedule VII)</label>
+      <select id="cause" name="cause" required>
+        <option value="">Choose…</option>
+        <% for (const [k, l] of Object.entries(CAUSES)) { %><option value="<%= k %>" <%= values.cause === k ? 'selected' : '' %>><%= l %></option><% } %>
+      </select>
+      <%- include('../partials/err', { name: 'cause' }) %>
+    </div>
+    <div>
+      <label for="budget">Budget (₹)</label>
+      <input id="budget" name="budget" value="<%= values.budget || '' %>" inputmode="decimal" placeholder="4000000" required>
+      <%- include('../partials/err', { name: 'budget' }) %>
+    </div>
+    <div>
+      <label for="deadline">Application deadline</label>
+      <input id="deadline" name="deadline" type="date" value="<%= values.deadline || '' %>" min="<%= new Date().toISOString().slice(0,10) %>" required>
+      <%- include('../partials/err', { name: 'deadline' }) %>
+    </div>
+  </div>
+
+  <% const sel = [].concat(values.states || []); %>
+  <label for="states">States <span class="muted">(choose Pan-India for nationwide)</span></label>
+  <select id="states" name="states" multiple size="8">
+    <% for (const s of STATES) { %><option <%= sel.includes(s) ? 'selected' : '' %>><%= s %></option><% } %>
+  </select>
+  <p class="muted small">Hold Ctrl / Cmd to select several.</p>
+  <%- include('../partials/err', { name: 'states' }) %>
+
+  <button class="btn">Publish program</button>
+</form>
+<%- include('../partials/bottom') %>

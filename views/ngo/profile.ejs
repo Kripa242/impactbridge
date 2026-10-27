@@ -1,0 +1,72 @@
+<%- include('../partials/top') %>
+<div class="page-head">
+  <h1>NGO profile</h1>
+  <% if (ngo) { %><%- include('../partials/badge', { s: ngo.status }) %><% } %>
+</div>
+
+<% if (!ngo) { %>
+  <div class="callout">Companies can only fund verified NGOs. Fill in your registration details below — our team checks them, usually within a day.</div>
+<% } else if (ngo.status === 'pending') { %>
+  <div class="callout">Your profile is in the verification queue. You can browse programs meanwhile; applying unlocks once you're verified.</div>
+<% } else if (ngo.status === 'rejected') { %>
+  <div class="callout callout-warn"><strong>Verification declined:</strong> <%= ngo.review_note %><br>Update the details below and save to resubmit.</div>
+<% } else { %>
+  <div class="callout callout-ok">Verified<% if (ngo.reviewed_at) { %> on <%= fmtDate(ngo.reviewed_at) %><% } %>. Note: changing any registration number sends your profile back for re-verification.</div>
+<% } %>
+
+<form class="card form" method="post" action="/ngo/profile" novalidate data-once>
+  <div class="grid2">
+    <div>
+      <label for="name">Organisation name</label>
+      <input id="name" name="name" value="<%= values.name || '' %>" required>
+      <%- include('../partials/err', { name: 'name' }) %>
+    </div>
+    <div>
+      <label for="csr1Number">CSR-1 registration number</label>
+      <input id="csr1Number" name="csr1Number" value="<%= values.csr1Number || '' %>" placeholder="CSR00012345" required>
+      <%- include('../partials/err', { name: 'csr1Number' }) %>
+    </div>
+    <div>
+      <label for="pan">PAN</label>
+      <input id="pan" name="pan" value="<%= values.pan || '' %>" placeholder="AAATR1234K" required>
+      <%- include('../partials/err', { name: 'pan' }) %>
+    </div>
+    <div>
+      <label for="reg12a">12A registration number</label>
+      <input id="reg12a" name="reg12a" value="<%= values.reg12a || '' %>" required>
+      <%- include('../partials/err', { name: 'reg12a' }) %>
+    </div>
+    <div>
+      <label for="reg80g">80G registration number</label>
+      <input id="reg80g" name="reg80g" value="<%= values.reg80g || '' %>" required>
+      <%- include('../partials/err', { name: 'reg80g' }) %>
+    </div>
+  </div>
+
+  <label for="description">What does your organisation do?</label>
+  <textarea id="description" name="description" rows="4" maxlength="2000" required><%= values.description || '' %></textarea>
+  <%- include('../partials/err', { name: 'description' }) %>
+
+  <% const selCauses = [].concat(values.causes || []); const selStates = [].concat(values.states || []); %>
+  <fieldset>
+    <legend>Cause areas (Schedule VII)</legend>
+    <div class="checks">
+      <% for (const [key, label] of Object.entries(CAUSES)) { %>
+        <label class="check"><input type="checkbox" name="causes" value="<%= key %>" <%= selCauses.includes(key) ? 'checked' : '' %>> <%= label %></label>
+      <% } %>
+    </div>
+    <%- include('../partials/err', { name: 'causes' }) %>
+  </fieldset>
+
+  <fieldset>
+    <legend>Where you operate</legend>
+    <select name="states" multiple size="8" aria-describedby="states-hint">
+      <% for (const s of STATES) { %><option <%= selStates.includes(s) ? 'selected' : '' %>><%= s %></option><% } %>
+    </select>
+    <p class="muted small" id="states-hint">Hold Ctrl / Cmd to select several.</p>
+    <%- include('../partials/err', { name: 'states' }) %>
+  </fieldset>
+
+  <button class="btn"><%= ngo ? 'Save changes' : 'Submit for verification' %></button>
+</form>
+<%- include('../partials/bottom') %>

@@ -1,0 +1,30 @@
+<%- include('../partials/top') %>
+<section class="auth card">
+  <h1>Create your account</h1>
+  <form method="post" action="/register" novalidate data-once>
+    <fieldset class="roles">
+      <legend>I am signing up as</legend>
+      <label class="role-opt"><input type="radio" name="role" value="company" <%= values.role === 'company' ? 'checked' : '' %>>
+        <span><strong>A company</strong><small>I manage CSR budgets</small></span></label>
+      <label class="role-opt"><input type="radio" name="role" value="ngo" <%= values.role === 'ngo' ? 'checked' : '' %>>
+        <span><strong>An NGO</strong><small>I want CSR funding</small></span></label>
+    </fieldset>
+    <%- include('../partials/err', { name: 'role' }) %>
+
+    <label for="name">Your name</label>
+    <input id="name" name="name" value="<%= values.name || '' %>" autocomplete="name" required>
+    <%- include('../partials/err', { name: 'name' }) %>
+
+    <label for="email">Work email</label>
+    <input id="email" name="email" type="email" value="<%= values.email || '' %>" autocomplete="email" required>
+    <%- include('../partials/err', { name: 'email' }) %>
+
+    <label for="password">Password <span class="muted">(min. 8 characters)</span></label>
+    <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+    <%- include('../partials/err', { name: 'password' }) %>
+
+    <button class="btn btn-block">Create account</button>
+  </form>
+  <p class="muted center">Already registered? <a href="/login">Log in</a></p>
+</section>
+<%- include('../partials/bottom') %>

@@ -1,0 +1,62 @@
+<%- include('../partials/top') %>
+<div class="page-head">
+  <div>
+    <h1>CSR programs for <%= ngo.name %></h1>
+    <p class="muted">Ranked by how well each program fits your causes, regions and track record.</p>
+  </div>
+</div>
+
+<% if (ngo.status !== 'verified') { %>
+  <div class="callout <%= ngo.status === 'rejected' ? 'callout-warn' : '' %>">
+    <%= ngo.status === 'pending' ? 'Your profile is awaiting verification — you can browse, but applying unlocks once verified.' : 'Your verification was declined. Update your profile to apply.' %>
+    <a href="/ngo/profile">View profile</a>
+  </div>
+<% } %>
+
+<form class="filters card" method="get" action="/ngo/programs">
+  <input type="search" name="q" value="<%= filters.q %>" placeholder="Search programs or companies" aria-label="Search">
+  <select name="cause" aria-label="Cause">
+    <option value="">All causes</option>
+    <% for (const [k, l] of Object.entries(CAUSES)) { %><option value="<%= k %>" <%= filters.cause === k ? 'selected' : '' %>><%= l %></option><% } %>
+  </select>
+  <select name="state" aria-label="State">
+    <option value="">All states</option>
+    <% for (const s of STATES.slice(1)) { %><option <%= filters.state === s ? 'selected' : '' %>><%= s %></option><% } %>
+  </select>
+  <select name="sort" aria-label="Sort">
+    <option value="match" <%= filters.sort === 'match' ? 'selected' : '' %>>Best match</option>
+    <option value="deadline" <%= filters.sort === 'deadline' ? 'selected' : '' %>>Closing soon</option>
+    <option value="budget" <%= filters.sort === 'budget' ? 'selected' : '' %>>Largest budget</option>
+  </select>
+  <button class="btn">Filter</button>
+</form>
+
+<% if (!programs.length) { %>
+  <section class="card empty">
+    <h3>No open programs match these filters</h3>
+    <p class="muted">Try clearing filters — new programs are published regularly.</p>
+    <a class="btn btn-ghost" href="/ngo/programs">Clear filters</a>
+  </section>
+<% } %>
+
+<div class="cards">
+  <% for (const p of programs) { const left = daysLeft(p.deadline); %>
+    <a class="card program" href="/ngo/programs/<%= p.id %>">
+      <div class="program-top">
+        <span class="score score-<%= p.match.score >= 75 ? 'hi' : p.match.score >= 50 ? 'mid' : 'lo' %>"><%= p.match.score %><small>/100</small></span>
+        <div>
+          <h3><%= p.title %></h3>
+          <div class="muted small"><%= p.company_name %> · <%= CAUSES[p.cause] %></div>
+        </div>
+      </div>
+      <p class="clamp"><%= p.description %></p>
+      <ul class="reasons"><% for (const r of p.match.reasons) { %><li><%= r %></li><% } %></ul>
+      <div class="program-foot">
+        <span><strong><%= inr(p.available) %></strong> <span class="muted">available</span></span>
+        <span class="<%= left <= 3 ? 'urgent' : 'muted' %>"><%= left === 0 ? 'Closes today' : `${left} day${left === 1 ? '' : 's'} left` %></span>
+        <% if (p.my_proposal_id) { %><%- include('../partials/badge', { s: p.my_proposal_status }) %><% } %>
+      </div>
+    </a>
+  <% } %>
+</div>
+<%- include('../partials/bottom') %>

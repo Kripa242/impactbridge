@@ -1,0 +1,33 @@
+<%- include('../partials/top') %>
+<p class="crumb"><a href="/ngo/proposals">← My proposals</a></p>
+<div class="page-head">
+  <div>
+    <h1><%= proposal.title %></h1>
+    <p class="muted"><a href="/ngo/programs/<%= proposal.program_id %>"><%= proposal.program_title %></a> · <%= proposal.company_name %></p>
+  </div>
+  <%- include('../partials/badge', { s: proposal.status }) %>
+</div>
+
+<% if (proposal.status === 'rejected' && proposal.decision_note) { %>
+  <div class="callout callout-warn"><strong>Company's note:</strong> <%= proposal.decision_note %></div>
+<% } else if (proposal.status === 'submitted' || proposal.status === 'shortlisted') { %>
+  <div class="callout">Waiting for <%= proposal.company_name %> to decide. Milestone evidence opens once the proposal is funded.</div>
+<% } %>
+
+<dl class="facts card">
+  <div><dt>Requested</dt><dd><%= inr(proposal.amount) %></dd></div>
+  <div><dt>Released so far</dt><dd><%= inr(proposal.released) %></dd></div>
+  <div><dt>Milestones</dt><dd><%= proposal.milestones.filter(m => m.status === 'approved').length %> / <%= proposal.milestones.length %></dd></div>
+</dl>
+
+<div class="split">
+  <section class="card">
+    <h3>Milestones</h3>
+    <%- include('../partials/milestones', { mode: 'ngo' }) %>
+  </section>
+  <div>
+    <section class="card"><h3>Summary</h3><p class="prewrap"><%= proposal.summary %></p></section>
+    <%- include('../partials/trail') %>
+  </div>
+</div>
+<%- include('../partials/bottom') %>

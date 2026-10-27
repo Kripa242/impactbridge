@@ -1,0 +1,29 @@
+<%- include('../partials/top') %>
+<div class="page-head"><h1><%= company ? 'Company profile' : 'Set up your company' %></h1></div>
+<% if (!company) { %>
+  <div class="callout">Your CSR obligation is typically 2% of the average net profit of the last three financial years (Section 135, Companies Act 2013). We track your spending against it.</div>
+<% } %>
+<form class="card form narrow" method="post" action="/company/setup" novalidate data-once>
+  <label for="name">Company name</label>
+  <input id="name" name="name" value="<%= values.name || '' %>" required>
+  <%- include('../partials/err', { name: 'name' }) %>
+
+  <label for="cin">Corporate Identification Number (CIN)</label>
+  <input id="cin" name="cin" value="<%= values.cin || '' %>" placeholder="L17110MH1973PLC019786" maxlength="21" required>
+  <%- include('../partials/err', { name: 'cin' }) %>
+
+  <div class="grid2">
+    <div>
+      <label for="fiscalYear">Fiscal year</label>
+      <input id="fiscalYear" name="fiscalYear" value="<%= values.fiscalYear || '2026-27' %>" placeholder="2026-27" required>
+      <%- include('../partials/err', { name: 'fiscalYear' }) %>
+    </div>
+    <div>
+      <label for="obligation">CSR obligation this year (₹)</label>
+      <input id="obligation" name="obligation" value="<%= values.obligation || '' %>" inputmode="decimal" required>
+      <%- include('../partials/err', { name: 'obligation' }) %>
+    </div>
+  </div>
+  <button class="btn">Save profile</button>
+</form>
+<%- include('../partials/bottom') %>

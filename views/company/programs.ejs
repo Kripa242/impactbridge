@@ -1,0 +1,12 @@
+<%- include('../partials/top') %>
+<div class="page-head"><h1>CSR programs</h1><a class="btn" href="/company/programs/new">New program</a></div>
+<% if (!programs.length) { %>
+  <section class="card empty">
+    <h3>No programs yet</h3>
+    <p class="muted">A program is a pot of CSR budget for one cause and region. Verified NGOs apply to it with milestone plans.</p>
+    <a class="btn" href="/company/programs/new">Create a program</a>
+  </section>
+<% } else { %>
+  <section class="card"><%- include('_programs-table', { programs }) %></section>
+<% } %>
+<%- include('../partials/bottom') %>

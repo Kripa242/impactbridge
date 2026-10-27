@@ -1,0 +1,59 @@
+<ol class="milestones">
+<% for (const m of proposal.milestones) { %>
+  <li class="ms ms-<%= m.status %>">
+    <div class="ms-dot" aria-hidden="true"><%= m.status === 'approved' ? '✓' : m.seq %></div>
+    <div class="ms-body">
+      <div class="ms-head">
+        <strong><%= m.title %></strong>
+        <%- include('badge', { s: 'ms_' + m.status }) %>
+      </div>
+      <div class="muted small"><%= inr(m.amount) %> · due <%= fmtDate(m.due_date) %>
+        <% if (m.revision_count) { %> · sent back <%= m.revision_count %>×<% } %></div>
+
+      <% if (m.evidence_note) { %>
+        <div class="evidence">
+          <div class="label">Progress report<% if (m.submitted_at) { %> · <%= fmtDateTime(m.submitted_at) %><% } %></div>
+          <p><%= m.evidence_note %></p>
+          <% if (m.evidence_file_id) { %><a class="file" href="/files/<%= m.evidence_file_id %>" target="_blank" rel="noopener">View attached evidence</a><% } %>
+        </div>
+      <% } %>
+      <% if (m.review_note) { %>
+        <div class="review <%= m.status === 'revision' ? 'review-warn' : '' %>">
+          <div class="label"><%= m.status === 'revision' ? 'Changes requested' : 'Reviewer note' %></div>
+          <p><%= m.review_note %></p>
+        </div>
+      <% } %>
+
+      <% if (mode === 'ngo' && proposal.status === 'approved' && m.id === nextOpenId && ['pending','revision'].includes(m.status)) { %>
+        <form class="card inset" method="post" action="/ngo/milestones/<%= m.id %>/evidence" enctype="multipart/form-data" data-once>
+          <label for="note-<%= m.id %>">Progress report <span class="muted">(what was done, numbers reached)</span></label>
+          <textarea id="note-<%= m.id %>" name="note" rows="4" minlength="20" maxlength="3000" required><%= m.status === 'revision' ? m.evidence_note : '' %></textarea>
+          <label for="file-<%= m.id %>">Evidence file <span class="muted">(PDF, PNG or JPEG, max 2 MB — optional)</span></label>
+          <input id="file-<%= m.id %>" type="file" name="evidence" accept="application/pdf,image/png,image/jpeg" data-maxbytes="2097152">
+          <button class="btn"><%= m.status === 'revision' ? 'Resubmit evidence' : 'Submit for review' %></button>
+        </form>
+      <% } else if (mode === 'ngo' && proposal.status === 'approved' && ['pending'].includes(m.status)) { %>
+        <p class="muted small">Unlocks after milestone <%= m.seq - 1 %> is approved.</p>
+      <% } %>
+
+      <% if (mode === 'company' && m.status === 'submitted') { %>
+        <div class="review-actions">
+          <form method="post" action="/company/milestones/<%= m.id %>/review" data-once data-confirm="Release <%= inr(m.amount) %> to <%= proposal.ngo_name %>?">
+            <input type="hidden" name="action" value="approve">
+            <button class="btn">Approve &amp; release <%= inr(m.amount) %></button>
+          </form>
+          <details>
+            <summary class="btn btn-ghost">Request changes</summary>
+            <form method="post" action="/company/milestones/<%= m.id %>/review" data-once>
+              <input type="hidden" name="action" value="revise">
+              <label for="rev-<%= m.id %>">What should the NGO fix or add?</label>
+              <textarea id="rev-<%= m.id %>" name="note" rows="3" required minlength="5" maxlength="1000"></textarea>
+              <button class="btn btn-warn">Send back</button>
+            </form>
+          </details>
+        </div>
+      <% } %>
+    </div>
+  </li>
+<% } %>
+</ol>

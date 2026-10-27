@@ -1,0 +1,17 @@
+<%- include('../partials/top') %>
+<section class="auth card">
+  <h1>Welcome back</h1>
+  <form method="post" action="/login" novalidate data-once>
+    <input type="hidden" name="next" value="<%= next %>">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="<%= values.email || '' %>" autocomplete="email" required autofocus>
+    <%- include('../partials/err', { name: 'email' }) %>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <%- include('../partials/err', { name: 'password' }) %>
+    <button class="btn btn-block">Log in</button>
+  </form>
+  <p class="muted center">New here? <a href="/register">Create an account</a></p>
+  <p class="muted center small">Demo: <code>csr@tatvasteel.demo</code> / <code>demo1234</code></p>
+</section>
+<%- include('../partials/bottom') %>

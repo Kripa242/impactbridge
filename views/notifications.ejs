@@ -1,0 +1,15 @@
+<%- include('partials/top') %>
+<div class="page-head"><h1>Notifications</h1></div>
+<% if (!items.length) { %>
+  <section class="card empty"><p class="muted">You're all caught up. Updates on verification, proposals and milestones will appear here.</p></section>
+<% } else { %>
+  <ul class="card list">
+    <% for (const n of items) { %>
+      <li class="<%= n.is_read ? '' : 'unread' %>">
+        <% if (n.link) { %><a href="<%= n.link %>"><%= n.message %></a><% } else { %><%= n.message %><% } %>
+        <span class="muted small"><%= fmtDateTime(n.created_at) %></span>
+      </li>
+    <% } %>
+  </ul>
+<% } %>
+<%- include('partials/bottom') %>

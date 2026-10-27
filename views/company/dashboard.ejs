@@ -1,0 +1,69 @@
+<%- include('../partials/top') %>
+<% const s = summary; const pctOf = (v) => s.obligation > 0 ? Math.min(100, (v / s.obligation) * 100) : 0; %>
+<div class="page-head">
+  <div>
+    <h1><%= company.name %></h1>
+    <p class="muted">CSR compliance · FY <%= company.fiscal_year %> · <a href="/company/setup">edit profile</a></p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="/company/report.csv">Download CSR report (CSV)</a>
+    <a class="btn" href="/company/programs/new">New program</a>
+  </div>
+</div>
+
+<section class="kpis">
+  <div class="kpi"><span>CSR obligation</span><strong><%= inr(s.obligation) %></strong></div>
+  <div class="kpi"><span>Committed to NGOs</span><strong><%= inr(s.committed) %></strong><small><%= s.committedPct %>% of obligation</small></div>
+  <div class="kpi"><span>Released (spent)</span><strong><%= inr(s.released) %></strong><small><%= s.releasedPct %>% of obligation</small></div>
+  <div class="kpi <%= s.unallocated > 0 ? 'kpi-warn' : 'kpi-ok' %>"><span>Not yet allocated</span><strong><%= inr(s.unallocated) %></strong><small><%= s.unallocated > 0 ? 'Unspent CSR must go to an unspent account or Schedule VII fund' : 'Fully allocated' %></small></div>
+</section>
+
+<section class="card">
+  <h3>Progress towards obligation</h3>
+  <svg class="bar" viewBox="0 0 100 6" preserveAspectRatio="none" role="img" aria-label="<%= s.releasedPct %>% released, <%= s.committedPct %>% committed">
+    <rect class="bar-bg" x="0" y="0" width="100" height="6" rx="1.5"/>
+    <rect class="bar-committed" x="0" y="0" width="<%= pctOf(s.committed) %>" height="6" rx="1.5"/>
+    <rect class="bar-released" x="0" y="0" width="<%= pctOf(s.released) %>" height="6" rx="1.5"/>
+  </svg>
+  <div class="legend small"><span class="key key-released"></span>Released <span class="key key-committed"></span>Committed, awaiting milestones <span class="key key-bg"></span>Unallocated</div>
+  <% if (s.overdueMilestones) { %><p class="urgent small"><%= s.overdueMilestones %> funded milestone<%= s.overdueMilestones > 1 ? 's are' : ' is' %> past due without evidence.</p><% } %>
+</section>
+
+<div class="split">
+  <section class="card">
+    <h3>Needs your review <% if (s.pendingMilestones + s.pendingProposals) { %><span class="pill"><%= s.pendingMilestones + s.pendingProposals %></span><% } %></h3>
+    <% if (!s.reviewQueue.length && !s.pendingProposals) { %>
+      <p class="muted">Nothing waiting. New proposals and milestone evidence will show up here.</p>
+    <% } %>
+    <ul class="list">
+      <% for (const m of s.reviewQueue) { %>
+        <li><a href="/company/proposals/<%= m.proposal_id %>"><strong>Milestone <%= m.seq %>:</strong> <%= m.title %></a>
+          <span class="muted small"><%= m.ngo_name %> · <%= inr(m.amount) %> · submitted <%= fmtDateTime(m.submitted_at) %></span></li>
+      <% } %>
+    </ul>
+    <% if (s.pendingProposals) { %><p class="small"><strong><%= s.pendingProposals %></strong> proposal<%= s.pendingProposals > 1 ? 's' : '' %> awaiting a decision — see programs below.</p><% } %>
+  </section>
+
+  <section class="card">
+    <h3>Committed by cause area</h3>
+    <% if (!s.byCause.length) { %><p class="muted">No funds committed yet.</p><% } %>
+    <% const maxC = Math.max(1, ...s.byCause.map(c => c.committed)); %>
+    <ul class="causebars">
+      <% for (const c of s.byCause) { %>
+        <li><span><%= c.label %></span>
+          <svg viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true"><rect class="bar-committed" width="<%= c.committed / maxC * 100 %>" height="4" rx="1"/><rect class="bar-released" width="<%= c.released / maxC * 100 %>" height="4" rx="1"/></svg>
+          <b><%= inr(c.committed) %></b></li>
+      <% } %>
+    </ul>
+  </section>
+</div>
+
+<section class="card">
+  <h3>Programs</h3>
+  <% if (!programs.length) { %>
+    <div class="empty"><p class="muted">You haven't published a CSR program yet.</p><a class="btn" href="/company/programs/new">Create your first program</a></div>
+  <% } else { %>
+    <%- include('_programs-table', { programs }) %>
+  <% } %>
+</section>
+<%- include('../partials/bottom') %>

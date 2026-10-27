@@ -1,0 +1,18 @@
+<% const actionText = {
+  proposal_submitted: 'submitted the proposal', proposal_shortlisted: 'shortlisted the proposal',
+  proposal_approved: 'approved the proposal and committed budget', proposal_rejected: 'rejected the proposal',
+  proposal_completed: 'all milestones complete — project closed', milestone_submitted: 'submitted evidence for milestone',
+  milestone_approved: 'approved milestone', milestone_sent_back: 'requested changes on milestone',
+}; %>
+<section class="card">
+  <h3>Activity log</h3>
+  <% if (!trail.length) { %><p class="muted">No activity yet.</p><% } %>
+  <ul class="trail">
+    <% for (const a of trail) { const d = a.detail || {}; %>
+      <li>
+        <span class="muted small"><%= fmtDateTime(a.created_at) %></span>
+        <span><strong><%= a.actor_name || 'System' %></strong> <%= actionText[a.action] || a.action %><%= d.seq ? ' ' + d.seq : '' %><%= d.released ? ` (${inr(d.released)} released)` : '' %></span>
+      </li>
+    <% } %>
+  </ul>
+</section>

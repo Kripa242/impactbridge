@@ -1,0 +1,8 @@
+<%- include('partials/top') %>
+<section class="card empty">
+  <p class="eyebrow"><%= status %></p>
+  <h1><%= status === 404 ? 'Page not found' : status === 403 ? 'Not allowed' : 'Something went wrong' %></h1>
+  <p class="muted"><%= message %></p>
+  <a class="btn" href="/">Go home</a>
+</section>
+<%- include('partials/bottom') %>

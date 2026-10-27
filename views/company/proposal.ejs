@@ -1,0 +1,64 @@
+<%- include('../partials/top') %>
+<p class="crumb"><a href="/company/programs/<%= program.id %>">← <%= program.title %></a></p>
+<div class="page-head">
+  <div>
+    <h1><%= proposal.title %></h1>
+    <p class="muted"><%= proposal.ngo_name %> · CSR-1 <%= proposal.csr1_number %> · <%- include('../partials/badge', { s: proposal.ngo_status }) %></p>
+  </div>
+  <%- include('../partials/badge', { s: proposal.status }) %>
+</div>
+
+<dl class="facts card">
+  <div><dt>Requested</dt><dd><%= inr(proposal.amount) %></dd></div>
+  <div><dt>Released</dt><dd><%= inr(proposal.released) %></dd></div>
+  <div><dt>Program uncommitted</dt><dd><%= inr(program.available) %></dd></div>
+  <div><dt>Match score</dt><dd><%= match.score %>/100 <span class="muted small"><%= scoreLabel(match.score) %></span></dd></div>
+</dl>
+
+<% if (['submitted', 'shortlisted'].includes(proposal.status)) { const fits = proposal.amount <= program.available; %>
+  <section class="card decision">
+    <h3>Decision</h3>
+    <% if (!fits) { %><p class="callout callout-warn">This request is larger than the program's uncommitted budget (<%= inr(program.available) %>). Approval is blocked unless budget frees up.</p><% } %>
+    <div class="review-actions">
+      <form method="post" action="/company/proposals/<%= proposal.id %>/decision" data-once data-confirm="Approve and commit <%= inr(proposal.amount) %> from this program's budget?">
+        <input type="hidden" name="action" value="approve">
+        <button class="btn" <%= fits ? '' : 'disabled' %>>Approve &amp; commit <%= inr(proposal.amount) %></button>
+      </form>
+      <% if (proposal.status === 'submitted') { %>
+        <form method="post" action="/company/proposals/<%= proposal.id %>/decision" data-once>
+          <input type="hidden" name="action" value="shortlist">
+          <button class="btn btn-ghost">Shortlist</button>
+        </form>
+      <% } %>
+      <details>
+        <summary class="btn btn-ghost">Reject</summary>
+        <form method="post" action="/company/proposals/<%= proposal.id %>/decision" data-once>
+          <input type="hidden" name="action" value="reject">
+          <label for="reject-note">Reason (shared with the NGO)</label>
+          <textarea id="reject-note" name="note" rows="3" required minlength="5" maxlength="1000"></textarea>
+          <button class="btn btn-warn">Reject proposal</button>
+        </form>
+      </details>
+    </div>
+  </section>
+<% } else if (proposal.decision_note) { %>
+  <div class="callout"><strong>Decision note:</strong> <%= proposal.decision_note %></div>
+<% } %>
+
+<div class="split">
+  <section class="card">
+    <h3>Milestones</h3>
+    <%- include('../partials/milestones', { mode: 'company' }) %>
+  </section>
+  <div>
+    <section class="card">
+      <h3>Proposal</h3>
+      <p class="prewrap"><%= proposal.summary %></p>
+      <h4>About <%= proposal.ngo_name %></h4>
+      <p class="prewrap muted"><%= proposal.ngo_description %></p>
+      <ul class="reasons"><% for (const r of match.reasons) { %><li><%= r %></li><% } %></ul>
+    </section>
+    <%- include('../partials/trail') %>
+  </div>
+</div>
+<%- include('../partials/bottom') %>

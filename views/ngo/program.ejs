@@ -1,0 +1,72 @@
+<%- include('../partials/top') %>
+<p class="crumb"><a href="/ngo/programs">← All programs</a></p>
+<div class="page-head">
+  <div>
+    <h1><%= program.title %></h1>
+    <p class="muted"><%= program.company_name %> · <%= CAUSES[program.cause] %> · <%= program.states.join(', ') %></p>
+  </div>
+  <span class="score score-<%= match.score >= 75 ? 'hi' : match.score >= 50 ? 'mid' : 'lo' %>"><%= match.score %><small>/100</small></span>
+</div>
+
+<div class="split">
+  <section class="card">
+    <h3>About this program</h3>
+    <p class="prewrap"><%= program.description %></p>
+    <dl class="facts">
+      <div><dt>Total budget</dt><dd><%= inr(program.budget) %></dd></div>
+      <div><dt>Still available</dt><dd><%= inr(program.available) %></dd></div>
+      <div><dt>Apply by</dt><dd><%= fmtDate(program.deadline) %></dd></div>
+    </dl>
+  </section>
+  <section class="card">
+    <h3>Why it's a <%= scoreLabel(match.score).toLowerCase() %></h3>
+    <ul class="meter">
+      <li><span>Cause fit</span><meter min="0" max="50" value="<%= match.breakdown.cause %>"></meter><b><%= match.breakdown.cause %>/50</b></li>
+      <li><span>Geography</span><meter min="0" max="30" value="<%= match.breakdown.geo %>"></meter><b><%= match.breakdown.geo %>/30</b></li>
+      <li><span>Track record</span><meter min="0" max="20" value="<%= match.breakdown.track %>"></meter><b><%= match.breakdown.track %>/20</b></li>
+    </ul>
+    <ul class="reasons"><% for (const r of match.reasons) { %><li><%= r %></li><% } %></ul>
+  </section>
+</div>
+
+<% if (mine) { %>
+  <section class="card callout-ok">You applied to this program. <%- include('../partials/badge', { s: mine.status }) %>
+    <a href="/ngo/proposals/<%= mine.id %>">View your proposal →</a></section>
+<% } else if (!accepting) { %>
+  <section class="card empty"><p class="muted">This program is no longer accepting applications.</p></section>
+<% } else if (ngo.status !== 'verified') { %>
+  <section class="card callout">Applying unlocks once your NGO profile is verified. <a href="/ngo/profile">Check status</a></section>
+<% } else { %>
+  <% const ms = (values.milestones && [].concat(Object.values(values.milestones))) || []; while (ms.length < 2) ms.push({}); %>
+  <form class="card form" method="post" action="/ngo/programs/<%= program.id %>/apply" novalidate data-once id="apply">
+    <h2>Apply with a milestone plan</h2>
+    <p class="muted">Funds are released milestone by milestone after the company reviews your evidence. The amount you request is the total of your milestones.</p>
+
+    <label for="title">Proposal title</label>
+    <input id="title" name="title" value="<%= values.title || '' %>" maxlength="150" required>
+    <%- include('../partials/err', { name: 'title' }) %>
+
+    <label for="summary">What will you do, for whom, and how will you measure it?</label>
+    <textarea id="summary" name="summary" rows="5" maxlength="3000" required><%= values.summary || '' %></textarea>
+    <%- include('../partials/err', { name: 'summary' }) %>
+
+    <fieldset>
+      <legend>Milestones <span class="muted">(in order, up to <%= MAX_MILESTONES %>; due after <%= fmtDate(program.deadline) %>)</span></legend>
+      <div id="ms-rows" data-max="<%= MAX_MILESTONES %>" data-available="<%= program.available %>">
+        <% ms.forEach((m, i) => { %>
+          <div class="ms-row">
+            <span class="ms-n"><%= i + 1 %></span>
+            <input name="milestones[<%= i %>][title]" value="<%= m.title || '' %>" placeholder="What will be delivered" aria-label="Milestone title">
+            <input name="milestones[<%= i %>][amount]" value="<%= m.amount || '' %>" placeholder="Amount ₹" inputmode="decimal" class="amt" aria-label="Amount">
+            <input name="milestones[<%= i %>][due]" value="<%= m.due || '' %>" type="date" min="<%= program.deadline %>" aria-label="Due date">
+          </div>
+        <% }) %>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="add-ms">+ Add milestone</button>
+      <%- include('../partials/err', { name: 'milestones' }) %>
+    </fieldset>
+    <p class="total">Total request: <strong id="ms-total">₹0</strong> <span class="muted">of <%= inr(program.available) %> available</span> <span id="ms-over" class="field-err" hidden>Exceeds available budget</span></p>
+    <button class="btn">Submit proposal</button>
+  </form>
+<% } %>
+<%- include('../partials/bottom') %>

@@ -1,0 +1,16 @@
+<table class="table">
+  <thead><tr><th>Program</th><th>Budget</th><th>Committed</th><th>Released</th><th>Proposals</th><th>Status</th></tr></thead>
+  <tbody>
+  <% for (const p of programs) { %>
+    <tr>
+      <td><a href="/company/programs/<%= p.id %>"><strong><%= p.title %></strong></a>
+        <div class="muted small"><%= CAUSES[p.cause] %> · deadline <%= fmtDate(p.deadline) %></div></td>
+      <td><%= inr(p.budget) %></td>
+      <td><%= inr(p.committed) %></td>
+      <td><%= inr(p.released) %></td>
+      <td><%= p.total_proposals %><% if (p.pending_proposals) { %> <span class="pill"><%= p.pending_proposals %> new</span><% } %></td>
+      <td><%- include('../partials/badge', { s: p.status === 'open' && daysLeft(p.deadline) < 0 ? 'closed' : p.status }) %></td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>

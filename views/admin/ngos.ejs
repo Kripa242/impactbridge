@@ -1,0 +1,47 @@
+<%- include('../partials/top') %>
+<div class="page-head"><h1>NGO verification</h1></div>
+<nav class="tabs" aria-label="Status">
+  <% for (const st of ['pending', 'verified', 'rejected']) { %>
+    <a href="/admin/ngos?status=<%= st %>" class="<%= status === st ? 'active' : '' %>"><%= st[0].toUpperCase() + st.slice(1) %> <span class="pill"><%= counts[st] || 0 %></span></a>
+  <% } %>
+</nav>
+
+<% if (!ngos.length) { %>
+  <section class="card empty"><p class="muted"><%= status === 'pending' ? 'The queue is empty — no NGOs waiting for verification.' : `No ${status} NGOs.` %></p></section>
+<% } %>
+
+<% for (const n of ngos) { %>
+  <article class="card ngo-review">
+    <div class="page-head">
+      <div><h3><%= n.name %></h3><div class="muted small"><%= n.email %> · submitted <%= fmtDateTime(n.updated_at) %></div></div>
+      <%- include('../partials/badge', { s: n.status }) %>
+    </div>
+    <dl class="facts">
+      <div><dt>CSR-1</dt><dd><code><%= n.csr1_number %></code></dd></div>
+      <div><dt>PAN</dt><dd><code><%= n.pan %></code></dd></div>
+      <div><dt>12A</dt><dd><code><%= n.reg_12a %></code></dd></div>
+      <div><dt>80G</dt><dd><code><%= n.reg_80g %></code></dd></div>
+    </dl>
+    <p class="prewrap"><%= n.description %></p>
+    <p class="small"><strong>Causes:</strong> <%= n.causes.map(c => CAUSES[c] || c).join(', ') %><br><strong>States:</strong> <%= n.states.join(', ') %></p>
+    <% if (n.review_note) { %><p class="small muted">Note: <%= n.review_note %></p><% } %>
+    <% if (n.status === 'pending') { %>
+      <div class="review-actions">
+        <form method="post" action="/admin/ngos/<%= n.id %>/review" data-once>
+          <input type="hidden" name="decision" value="verified">
+          <button class="btn">Verify</button>
+        </form>
+        <details>
+          <summary class="btn btn-ghost">Reject</summary>
+          <form method="post" action="/admin/ngos/<%= n.id %>/review" data-once>
+            <input type="hidden" name="decision" value="rejected">
+            <label for="rn-<%= n.id %>">What needs fixing? (shown to the NGO)</label>
+            <textarea id="rn-<%= n.id %>" name="note" rows="2" required minlength="5"></textarea>
+            <button class="btn btn-warn">Reject</button>
+          </form>
+        </details>
+      </div>
+    <% } %>
+  </article>
+<% } %>
+<%- include('../partials/bottom') %>

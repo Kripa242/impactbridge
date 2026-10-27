@@ -1,0 +1,25 @@
+<%- include('../partials/top') %>
+<div class="page-head"><h1>My proposals</h1><a class="btn btn-ghost" href="/ngo/programs">Find programs</a></div>
+<% if (!proposals.length) { %>
+  <section class="card empty">
+    <h3>No proposals yet</h3>
+    <p class="muted">Browse open CSR programs ranked for your NGO and apply with a milestone plan.</p>
+    <a class="btn" href="/ngo/programs">Browse programs</a>
+  </section>
+<% } else { %>
+  <table class="table card">
+    <thead><tr><th>Proposal</th><th>Requested</th><th>Progress</th><th>Status</th></tr></thead>
+    <tbody>
+    <% for (const p of proposals) { %>
+      <tr>
+        <td><a href="/ngo/proposals/<%= p.id %>"><strong><%= p.title %></strong></a><div class="muted small"><%= p.program_title %> · <%= p.company_name %></div></td>
+        <td><%= inr(p.amount) %></td>
+        <td><progress max="<%= p.milestone_count %>" value="<%= p.milestones_done %>"></progress> <span class="small muted"><%= p.milestones_done %>/<%= p.milestone_count %></span>
+          <% if (p.needs_revision) { %><div class="urgent small">Changes requested</div><% } %></td>
+        <td><%- include('../partials/badge', { s: p.status }) %></td>
+      </tr>
+    <% } %>
+    </tbody>
+  </table>
+<% } %>
+<%- include('../partials/bottom') %>

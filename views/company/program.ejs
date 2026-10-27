@@ -1,0 +1,49 @@
+<%- include('../partials/top') %>
+<p class="crumb"><a href="/company/programs">← Programs</a></p>
+<div class="page-head">
+  <div>
+    <h1><%= program.title %></h1>
+    <p class="muted"><%= CAUSES[program.cause] %> · <%= program.states.join(', ') %> · deadline <%= fmtDate(program.deadline) %></p>
+  </div>
+  <div class="actions">
+    <%- include('../partials/badge', { s: program.status }) %>
+    <form method="post" action="/company/programs/<%= program.id %>/status" data-once
+      <% if (program.status === 'open') { %>data-confirm="Close this program to new applications? Existing proposals stay as they are."<% } %>>
+      <input type="hidden" name="status" value="<%= program.status === 'open' ? 'closed' : 'open' %>">
+      <button class="btn btn-ghost btn-sm"><%= program.status === 'open' ? 'Close applications' : 'Reopen' %></button>
+    </form>
+  </div>
+</div>
+
+<dl class="facts card">
+  <div><dt>Budget</dt><dd><%= inr(program.budget) %></dd></div>
+  <div><dt>Committed</dt><dd><%= inr(program.committed) %></dd></div>
+  <div><dt>Released</dt><dd><%= inr(program.released) %></dd></div>
+  <div><dt>Uncommitted</dt><dd><%= inr(program.available) %></dd></div>
+</dl>
+
+<section class="card">
+  <h3>Proposals <span class="muted small">ranked by match score</span></h3>
+  <% if (!proposals.length) { %>
+    <p class="muted">No proposals yet. Verified NGOs working on <%= CAUSES[program.cause].toLowerCase() %> in these states see this program at the top of their list.</p>
+  <% } else { %>
+    <table class="table">
+      <thead><tr><th>Match</th><th>NGO &amp; proposal</th><th>Requested</th><th>Milestones</th><th>Status</th></tr></thead>
+      <tbody>
+      <% for (const p of proposals) { const fits = p.amount <= program.available; %>
+        <tr>
+          <td><span class="score score-sm score-<%= p.match.score >= 75 ? 'hi' : p.match.score >= 50 ? 'mid' : 'lo' %>" title="<%= p.match.reasons.join(' · ') %>"><%= p.match.score %></span></td>
+          <td><a href="/company/proposals/<%= p.id %>"><strong><%= p.title %></strong></a>
+            <div class="muted small"><%= p.ngo_name %> · <%= p.csr1_number %></div></td>
+          <td><%= inr(p.amount) %><% if (['submitted','shortlisted'].includes(p.status) && !fits) { %><div class="urgent small">Exceeds remaining budget</div><% } %></td>
+          <td><%= p.milestones_done %>/<%= p.milestone_count %></td>
+          <td><%- include('../partials/badge', { s: p.status }) %></td>
+        </tr>
+      <% } %>
+      </tbody>
+    </table>
+  <% } %>
+</section>
+
+<section class="card"><h3>Description</h3><p class="prewrap"><%= program.description %></p></section>
+<%- include('../partials/bottom') %>

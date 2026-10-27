@@ -1,0 +1,36 @@
+<%- include('partials/top') %>
+<section class="hero">
+  <div>
+    <p class="eyebrow">For CSR teams and NGOs in India</p>
+    <h1>CSR money that reaches the ground — <em>and proves it.</em></h1>
+    <p class="lead">Companies publish CSR programs. Verified NGOs apply with milestone plans. Funds are released one milestone at a time, against evidence — and your compliance report writes itself.</p>
+    <div class="cta">
+      <a class="btn btn-lg" href="/register?role=company">I fund CSR programs</a>
+      <a class="btn btn-lg btn-ghost" href="/register?role=ngo">I run an NGO</a>
+    </div>
+  </div>
+  <dl class="stats">
+    <div><dt>Verified NGOs</dt><dd><%= stats.ngos %></dd></div>
+    <div><dt>Open programs</dt><dd><%= stats.programs %></dd></div>
+    <div><dt>Released to date</dt><dd><%= inr(stats.released) %></dd></div>
+  </dl>
+</section>
+
+<section class="steps">
+  <div class="step"><span>1</span><h3>Verify</h3><p>NGOs submit CSR-1, 12A, 80G and PAN details. Our team verifies them before any money can move.</p></div>
+  <div class="step"><span>2</span><h3>Match</h3><p>Programs are ranked for each NGO by cause, geography and delivery track record — and proposals are ranked the same way for companies.</p></div>
+  <div class="step"><span>3</span><h3>Commit</h3><p>Approving a proposal commits budget atomically, so a program can never be promised more than it has.</p></div>
+  <div class="step"><span>4</span><h3>Release</h3><p>Each tranche is released only after the company reviews evidence for that milestone, in order.</p></div>
+</section>
+
+<section class="card demo">
+  <h3>Trying the demo?</h3>
+  <p class="muted">All demo accounts use the password <code>demo1234</code>.</p>
+  <ul>
+    <li><strong>Company:</strong> <code>csr@tatvasteel.demo</code> — has a milestone waiting for review</li>
+    <li><strong>NGO:</strong> <code>team@akshara.demo</code> — funded project in progress</li>
+    <li><strong>NGO:</strong> <code>info@greenroots.demo</code> — awaiting verification</li>
+    <li><strong>Admin:</strong> <code>admin@impactbridge.demo</code> — verification queue</li>
+  </ul>
+</section>
+<%- include('partials/bottom') %>

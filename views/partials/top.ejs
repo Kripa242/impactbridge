@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · ImpactBridge</title>
+  <meta name="description" content="ImpactBridge connects company CSR budgets with verified NGOs and releases funds milestone by milestone.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f4d3a'/%3E%3Cpath d='M6 22c4-8 16-8 20 0' stroke='%23f2a541' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="/">Impact<span>Bridge</span></a>
+    <% if (user) { %>
+      <nav class="nav" aria-label="Main">
+        <% const links = {
+             company: [['/company/dashboard','Dashboard'],['/company/programs','Programs']],
+             ngo: [['/ngo/programs','Find programs'],['/ngo/proposals','My proposals'],['/ngo/profile','Profile']],
+             admin: [['/admin/ngos','NGO verification']],
+           }[user.role] || []; %>
+        <% for (const [href, label] of links) { %>
+          <a href="<%= href %>" class="<%= path.startsWith(href) ? 'active' : '' %>"><%= label %></a>
+        <% } %>
+      </nav>
+      <div class="me">
+        <a class="bell" href="/notifications" aria-label="Notifications<%= unread ? ` (${unread} unread)` : '' %>">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2Zm7-6V11a7 7 0 0 0-5-6.7V3.5a2 2 0 0 0-4 0v.8A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z" fill="currentColor"/></svg>
+          <% if (unread) { %><span class="count"><%= unread > 9 ? '9+' : unread %></span><% } %>
+        </a>
+        <span class="who"><%= user.name %><small><%= user.role === 'ngo' ? 'NGO' : user.role %></small></span>
+        <form method="post" action="/logout"><button class="link">Log out</button></form>
+      </div>
+    <% } else { %>
+      <div class="me"><a href="/login">Log in</a><a class="btn btn-sm" href="/register">Get started</a></div>
+    <% } %>
+  </div>
+</header>
+<main class="wrap main">
+<% if (flash) { %><div class="flash flash-<%= flash.type %>" role="status"><%= flash.msg %></div><% } %>
+<% if (formError) { %><div class="flash flash-error" role="alert"><%= formError %></div><% } %>
